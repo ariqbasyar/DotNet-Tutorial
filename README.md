@@ -1,7 +1,7 @@
 # DotNet Tutorial
 This project, my learning project, is a project for learning **.NET**,
 **ASP.NET**, and **Azure Functions**. This project consists of:
-- [Hello World](Hello World), really simple **ASP.NET** "Hello World" web app.
+- [Hello World](./Hello World/), really simple **ASP.NET** "Hello World" web app.
 - [Todo App](Todo App), is an extended version of [Hello World](Hello World)
 app. This [solution](https://learn.microsoft.com/en-us/visualstudio/ide/solutions-and-projects-in-visual-studio?view=vs-2022#solutions)
 is a TODO listing app with full CRUD capability using
