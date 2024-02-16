@@ -1,0 +1,49 @@
+﻿@TodoApp_HostAddress = https://localhost:7174
+
+GET {{TodoApp_HostAddress}}/todoitems
+
+###
+
+POST {{TodoApp_HostAddress}}/todoitems
+Content-Type: application/json
+
+{
+  "name":"walk the fish",
+  "isComplete":true,
+  "secret":"yes"
+}
+
+###
+
+POST {{TodoApp_HostAddress}}/todoitems
+Content-Type: application/json
+
+{
+  "name":"claim azure mpn",
+  "isComplete":false
+}
+
+###
+
+GET {{TodoApp_HostAddress}}/todoitems/complete
+
+###
+
+GET {{TodoApp_HostAddress}}/todoitems/2
+
+###
+
+PUT {{TodoApp_HostAddress}}/todoitems/2
+Content-Type: application/json
+
+{
+  "name":"claimed azure mpn",
+  "isComplete":false,
+  "secret":"hahah"
+}
+
+###
+
+DELETE {{TodoApp_HostAddress}}/todoitems/2
+
+###
