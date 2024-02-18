@@ -2,7 +2,7 @@
   "profiles": {
     "TodoAppFunction": {
       "commandName": "Project",
-      "commandLineArgs": "--port 7236",
+      "commandLineArgs": "--port 7023",
       "launchBrowser": false
     }
   }
