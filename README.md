@@ -10,7 +10,8 @@ is a TODO listing app with full CRUD capability using
 [Microsoft's Azure Function](https://learn.microsoft.com/en-us/azure/azure-functions/functions-develop-vs?tabs=isolated-process).
 - **TodoAppFunction**, is an extended version of **HelloAzureFunction** app.
 This solution is a TODO listing app with full CRUD capability using singleton,
-in-memory, hand-made database.
+in-memory, hand-made database. See [this branch](https://github.com/ariqbasyar/DotNet-Tutorial/tree/assignment-2-todoapp-cosmos/TodoAppFunction)
+to have a look for the cosmosdb version with a trigger example.
 
 ## Acknowledgement
 This project is mostly done using tutorial from
