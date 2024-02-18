@@ -1,34 +1,49 @@
-using System.Net;
-using System.Text.Json;
+using System;
+using System.IO;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Functions.Worker;
-using Microsoft.Azure.Functions.Worker.Http;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Microsoft.Azure.Cosmos;
 
 namespace TodoAppFunction
 {
-    public class DeleteTodoItem
+    public static class DeleteTodoItem
     {
-        private readonly ILogger _logger;
-        private readonly TodoDB _todoDB = TodoDB.Instance;
-
-        public DeleteTodoItem(ILoggerFactory loggerFactory)
+        [FunctionName("DeleteTodoItem")]
+        public static async Task<IActionResult> Run(
+            [HttpTrigger(AuthorizationLevel.Function, "delete", Route = "Todo/{todoType}/{id}")] HttpRequest req,
+            [CosmosDB(
+                databaseName: DBConfig.DATABASE,
+                containerName: DBConfig.CONTAINER,
+                Connection = DBConfig.CONNECTION,
+                Id = "{id}",
+                PartitionKey = "{todoType}")]Model.Todo todo,
+            ILogger log)
         {
-            _logger = loggerFactory.CreateLogger<DeleteTodoItem>();
-        }
+            try
+            {
+                log.LogInformation("C# HTTP trigger function processed a DeleteTodoItem request.");
 
-        [Function("DeleteTodoItem")]
-        public IActionResult Run([HttpTrigger(AuthorizationLevel.Function, "delete")] HttpRequestData req)
-        {
-            _logger.LogInformation("C# HTTP trigger function processed a DELETE request.");
+                if (todo == null) throw new ArgumentNullException("User not found.");
+                var client = new CosmosClient(DBConfig.CONNECTIONSTRING);
+                Container cosmosContainer = client.GetDatabase(DBConfig.DATABASE)
+                                                  .GetContainer(DBConfig.CONTAINER);
 
-            int todoId = int.Parse(req.Query["id"]);
-            _logger.LogInformation($"todoId: {todoId}");
-
-            var deletedTodo = _todoDB.Delete(todoId);
-
-            if (deletedTodo == null) return new NotFoundObjectResult(404);
-            return new OkObjectResult(deletedTodo);
+                var partition = new PartitionKey(todo.TodoType);
+                var information = await cosmosContainer
+                                    .DeleteItemAsync<Model.Todo>(todo.Id,partition);
+                return new OkResult();
+            }
+            catch (Exception ex)
+            {
+                log.LogError(ex.Message);
+                return new BadRequestObjectResult(ex.Message);
+                throw;
+            }
         }
     }
 }

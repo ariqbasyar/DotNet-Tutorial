@@ -1,42 +1,66 @@
-using System.Net;
-using System.Text.Json;
+using System;
+using System.IO;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Functions.Worker;
-using Microsoft.Azure.Functions.Worker.Http;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Microsoft.Azure.Cosmos;
 
 namespace TodoAppFunction
 {
-    public class PutTodoItem
+    public static class PutTodoItem
     {
-        private readonly ILogger _logger;
-        private readonly TodoDB _todoDB = TodoDB.Instance;
-
-        public PutTodoItem(ILoggerFactory loggerFactory)
+        [FunctionName("PutTodoItem")]
+        public static async Task<IActionResult> Run(
+            [HttpTrigger(AuthorizationLevel.Function, "put", Route = "Todo/{todoType}/{id}")] HttpRequest req,
+            [CosmosDB(
+                databaseName: DBConfig.DATABASE,
+                containerName: DBConfig.CONTAINER,
+                Connection = DBConfig.CONNECTION,
+                Id = "{id}",
+                PartitionKey = "{todoType}")]Model.Todo oldTodo,
+            ILogger log)
         {
-            _logger = loggerFactory.CreateLogger<PutTodoItem>();
-        }
+            try
+            {
+                log.LogInformation("C# HTTP trigger function processed an UpdateTodoItem request.");
 
-        [Function("PutTodoItem")]
-        public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "put")] HttpRequestData req)
-        {
-            _logger.LogInformation("C# HTTP trigger function processed a PUT request.");
+                if (oldTodo is null) return new NotFoundResult();
+                string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+                var newTodo = JsonConvert.DeserializeObject<Model.Todo>(requestBody);
+                log.LogWarning($"old todo {JsonConvert.SerializeObject(oldTodo)}");
+                log.LogWarning($"new todo {JsonConvert.SerializeObject(newTodo)}");
+                var changedPartitionKey = oldTodo.TodoType != newTodo.TodoType;
+                var oldPartitionKey = changedPartitionKey ? oldTodo.TodoType : null;
+                var updatedTodo = oldTodo.Update(newTodo);
+                log.LogWarning($"updated todo {JsonConvert.SerializeObject(updatedTodo)}");
 
-            int todoId = int.Parse(req.Query["id"]);
-            _logger.LogInformation($"todoId: {todoId}");
+                var client = new CosmosClient(DBConfig.CONNECTIONSTRING);
+                Container cosmosContainer = client.GetDatabase(DBConfig.DATABASE)
+                                                  .GetContainer(DBConfig.CONTAINER);
 
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            _logger.LogInformation($"request body: {requestBody}");
-
-            var putTodo = JsonSerializer.Deserialize<Todo>(requestBody);
-            _logger.LogInformation($"Todo todo: {putTodo}");
-
-            var updatedTodo = _todoDB.Put(todoId, putTodo);
-            string strUpdatedTodo = JsonSerializer.Serialize(updatedTodo);
-            _logger.LogInformation($"Str Todo todo: {strUpdatedTodo}");
-
-            if (updatedTodo == null) return new NotFoundObjectResult(404);
-            return new OkObjectResult(updatedTodo);
+                if (changedPartitionKey)
+                {
+                    var oldPartition = new PartitionKey(oldPartitionKey);
+                    await cosmosContainer.DeleteItemAsync<Model.Todo>(oldTodo.Id, oldPartition);
+                    var newPartition = new PartitionKey(updatedTodo.TodoType);
+                    await cosmosContainer.CreateItemAsync(updatedTodo, newPartition);
+                }
+                else
+                {
+                    await cosmosContainer.ReplaceItemAsync(updatedTodo, oldTodo.Id);
+                }
+                return new OkObjectResult(updatedTodo);
+            }
+            catch (Exception e)
+            {
+                log.LogError(e.Message);
+                return new BadRequestObjectResult(e.Message);
+                throw;
+            }
         }
     }
 }

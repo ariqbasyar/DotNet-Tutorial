@@ -1,26 +1,59 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Functions.Worker;
-using Microsoft.Azure.Functions.Worker.Http;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace TodoAppFunction
 {
-    public class GetTodoItems
+    public static class GetTodoItems
     {
-        private readonly ILogger _logger;
-        private readonly TodoDB _todoDB = TodoDB.Instance;
-
-        public GetTodoItems(ILoggerFactory loggerFactory)
+        [FunctionName("GetTodoItem")]
+        public static IActionResult GetTodoItem(
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "Todo/{todoType}/{id}")] HttpRequest req,
+            [CosmosDB(
+                databaseName: DBConfig.DATABASE,
+                containerName: DBConfig.CONTAINER,
+                Connection = DBConfig.CONNECTION,
+                Id = "{id}",
+                PartitionKey = "{todoType}")]Model.Todo todo,
+            ILogger log)
         {
-            _logger = loggerFactory.CreateLogger<GetTodoItems>();
+            log.LogInformation("C# HTTP trigger function processed a GetTodoItem request.");
+
+            return new OkObjectResult(todo);
         }
 
-        [Function("GetTodoItems")]
-        public IActionResult Run([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequestData req)
+        [FunctionName("GetTodoByType")]
+        public static IActionResult GetTodoByType(
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "Todo/{todoType}")] HttpRequest req,
+            [CosmosDB(
+                databaseName: DBConfig.DATABASE,
+                containerName: DBConfig.CONTAINER,
+                Connection = DBConfig.CONNECTION,
+                PartitionKey = "{todoType}")] IEnumerable<Model.Todo> todoItems,
+            ILogger log)
         {
-            _logger.LogInformation("C# HTTP trigger function processed a GET request.");
+            log.LogInformation("C# HTTP trigger function processed a GetTodoByType request.");
 
-            return new OkObjectResult(_todoDB.Get());
+            return new OkObjectResult(todoItems.ToList());
+        }
+
+        [FunctionName("GetTodos")]
+        public static IActionResult GetTodos(
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "Todos")] HttpRequest req,
+            [CosmosDB(
+                databaseName: DBConfig.DATABASE,
+                containerName: DBConfig.CONTAINER,
+                Connection = DBConfig.CONNECTION)] IEnumerable<Model.Todo> todoItems,
+            ILogger log)
+        {
+            log.LogInformation("C# HTTP trigger function processed a GetTodoByType request.");
+
+            return new OkObjectResult(todoItems.ToList());
         }
     }
 }
