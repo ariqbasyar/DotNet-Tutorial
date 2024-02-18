@@ -18,7 +18,7 @@ namespace TodoAppFunction
             [HttpTrigger(AuthorizationLevel.Function, "delete", Route = "Todo/{todoType}/{id}")] HttpRequest req,
             [CosmosDB(
                 databaseName: DBConfig.DATABASE,
-                containerName: DBConfig.CONTAINER,
+                containerName: DBConfig.CONTAINERTODO,
                 Connection = DBConfig.CONNECTION,
                 Id = "{id}",
                 PartitionKey = "{todoType}")]Model.Todo todo,
@@ -31,7 +31,7 @@ namespace TodoAppFunction
                 if (todo == null) throw new ArgumentNullException("User not found.");
                 var client = new CosmosClient(DBConfig.CONNECTIONSTRING);
                 Container cosmosContainer = client.GetDatabase(DBConfig.DATABASE)
-                                                  .GetContainer(DBConfig.CONTAINER);
+                                                  .GetContainer(DBConfig.CONTAINERTODO);
 
                 var partition = new PartitionKey(todo.TodoType);
                 var information = await cosmosContainer

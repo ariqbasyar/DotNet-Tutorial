@@ -20,7 +20,7 @@ namespace TodoAppFunction
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = "Todo")] HttpRequest req,
             [CosmosDB(
                 databaseName: DBConfig.DATABASE,
-                containerName: DBConfig.CONTAINER,
+                containerName: DBConfig.CONTAINERTODO,
                 Connection = DBConfig.CONNECTION)]IAsyncCollector<dynamic> documentsOut,
             ILogger log)
         {

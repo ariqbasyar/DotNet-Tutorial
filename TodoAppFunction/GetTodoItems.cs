@@ -16,7 +16,7 @@ namespace TodoAppFunction
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "Todo/{todoType}/{id}")] HttpRequest req,
             [CosmosDB(
                 databaseName: DBConfig.DATABASE,
-                containerName: DBConfig.CONTAINER,
+                containerName: DBConfig.CONTAINERTODO,
                 Connection = DBConfig.CONNECTION,
                 Id = "{id}",
                 PartitionKey = "{todoType}")]Model.Todo todo,
@@ -32,7 +32,7 @@ namespace TodoAppFunction
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "Todo/{todoType}")] HttpRequest req,
             [CosmosDB(
                 databaseName: DBConfig.DATABASE,
-                containerName: DBConfig.CONTAINER,
+                containerName: DBConfig.CONTAINERTODO,
                 Connection = DBConfig.CONNECTION,
                 PartitionKey = "{todoType}")] IEnumerable<Model.Todo> todoItems,
             ILogger log)
@@ -47,7 +47,7 @@ namespace TodoAppFunction
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "Todos")] HttpRequest req,
             [CosmosDB(
                 databaseName: DBConfig.DATABASE,
-                containerName: DBConfig.CONTAINER,
+                containerName: DBConfig.CONTAINERTODO,
                 Connection = DBConfig.CONNECTION)] IEnumerable<Model.Todo> todoItems,
             ILogger log)
         {

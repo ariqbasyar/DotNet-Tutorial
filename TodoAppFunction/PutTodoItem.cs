@@ -18,7 +18,7 @@ namespace TodoAppFunction
             [HttpTrigger(AuthorizationLevel.Function, "put", Route = "Todo/{todoType}/{id}")] HttpRequest req,
             [CosmosDB(
                 databaseName: DBConfig.DATABASE,
-                containerName: DBConfig.CONTAINER,
+                containerName: DBConfig.CONTAINERTODO,
                 Connection = DBConfig.CONNECTION,
                 Id = "{id}",
                 PartitionKey = "{todoType}")]Model.Todo oldTodo,
@@ -40,7 +40,7 @@ namespace TodoAppFunction
 
                 var client = new CosmosClient(DBConfig.CONNECTIONSTRING);
                 Container cosmosContainer = client.GetDatabase(DBConfig.DATABASE)
-                                                  .GetContainer(DBConfig.CONTAINER);
+                                                  .GetContainer(DBConfig.CONTAINERTODO);
 
                 if (changedPartitionKey)
                 {
