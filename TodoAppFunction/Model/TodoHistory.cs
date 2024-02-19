@@ -29,11 +29,13 @@ namespace TodoAppFunction.Model
 
         public static TodoHistory CreateFrom(Todo todo)
         {
-            TodoHistory todoHistory = new();
-            todoHistory.TodoId = todo.Id;
-            todoHistory.Title = todo.Title;
-            todoHistory.TodoType = todo.TodoType;
-            todoHistory.IsComplete = todo.IsComplete;
+            TodoHistory todoHistory = new()
+            {
+                TodoId = todo.Id,
+                Title = todo.Title,
+                TodoType = todo.TodoType,
+                IsComplete = todo.IsComplete
+            };
             return todoHistory;
         }
     }
