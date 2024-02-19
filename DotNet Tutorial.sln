@@ -12,9 +12,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CosmosDBAndAzureFunctionPDP", "CosmosDBAndAzureFunctionPDP\CosmosDBAndAzureFunctionPDP.csproj", "{F2701B22-5064-473D-8271-07516DC15106}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E42D0B6B-1030-47F7-802A-0BD2BEAB9484}"
-	ProjectSection(SolutionItems) = preProject
-		.editorconfig = .editorconfig
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TodoAppFunction", "TodoAppFunction\TodoAppFunction.csproj", "{52FE934C-7968-4D50-94C2-396F7A384A01}"
 EndProject
