@@ -53,6 +53,7 @@ namespace TodoAppFunction
                 {
                     await cosmosContainer.ReplaceItemAsync(updatedTodo, oldTodo.Id);
                 }
+                await EventGridUtil.SendDataToEventGrid(updatedTodo, "Modify/");
                 return new OkObjectResult(updatedTodo);
             }
             catch (Exception e)

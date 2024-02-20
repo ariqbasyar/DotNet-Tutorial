@@ -1,20 +1,18 @@
 using System;
 using System.IO;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using TodoAppFunction.Model;
 
 namespace TodoAppFunction
 {
     public static class CreateTodoItem
     {
-
         [FunctionName("CreateTodoItem")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = "Todo")] HttpRequest req,
@@ -29,10 +27,11 @@ namespace TodoAppFunction
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             log.LogInformation($"request body: {requestBody}");
 
-            var newTodo = JsonSerializer.Deserialize<Todo>(requestBody);
+            var newTodo = JsonConvert.DeserializeObject<Todo>(requestBody);
             log.LogInformation($"Todo todo: {newTodo}");
 
             await documentsOut.AddAsync(newTodo);
+            await EventGridUtil.SendDataToEventGrid(newTodo, "Create/");
             return new OkObjectResult(newTodo);
         }
     }

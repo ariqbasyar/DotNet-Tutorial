@@ -3,40 +3,41 @@ using System;
 
 namespace TodoAppFunction.Model
 {
-    public class TodoHistory
+    public class Reminder
     {
         [JsonProperty("id")]
-        public string Id { get; set; }
+        public string Id {  get; set; }
 
         [JsonProperty("todoId")]
         public string TodoId { get; set; }
 
         [JsonProperty("title")]
-        public string Title {  get; set; }
+        public string Title { get; set; }
 
         [JsonProperty("todoType")]
         public string TodoType { get; set; }
 
-        [JsonProperty("isComplete")]
-        public bool? IsComplete { get; set; }
+        [JsonProperty("isCompleted")]
+        public bool IsCompleted { get; set; }
 
-        public DateTime CreatedDate { get; set; }
+        public DateTime CreatedTime { get; set; }
 
-        public TodoHistory() { 
+        public DateTime? ModifiedTime { get; set; }
+
+        public Reminder() {
             Id = Guid.NewGuid().ToString();
-            CreatedDate = DateTime.Now;
+            CreatedTime = DateTime.Now;
         }
 
-        public static TodoHistory CreateFrom(Todo todo)
+        public static Reminder CreateFrom(Todo todo)
         {
-            TodoHistory todoHistory = new()
+            return new Reminder()
             {
                 TodoId = todo.Id,
                 Title = todo.Title,
                 TodoType = todo.TodoType,
-                IsComplete = todo.IsComplete
+                IsCompleted = todo.IsComplete ?? false
             };
-            return todoHistory;
         }
     }
 }
