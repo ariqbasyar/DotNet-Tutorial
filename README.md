@@ -1,3 +1,4 @@
+
 # DotNet Tutorial
 This project, my learning project, is a project for learning **.NET**,
 **ASP.NET**, and **Azure Functions**. This project consists of:
@@ -10,8 +11,10 @@ is a TODO listing app with full CRUD capability using
 [Microsoft's Azure Function](https://learn.microsoft.com/en-us/azure/azure-functions/functions-develop-vs?tabs=isolated-process).
 - **TodoAppFunction**, is an extended version of **HelloAzureFunction** app.
 This solution is a TODO listing app with full CRUD capability using singleton,
-in-memory, hand-made database. See [this branch](https://github.com/ariqbasyar/DotNet-Tutorial/tree/assignment-2-todoapp-cosmos/TodoAppFunction)
-to have a look for the cosmosdb version with a trigger example.
+in-memory, hand-made database. 
+  - See [this branch](https://github.com/ariqbasyar/DotNet-Tutorial/tree/assignment-2-todoapp-cosmos/TodoAppFunction) to have a look for the cosmosdb version with a trigger example.
+  - See [this branch](https://github.com/ariqbasyar/DotNet-Tutorial/tree/assignment-3-todoapp-reminder/TodoAppFunction) to have a look for the event grid trigger example.
+
 
 ## Acknowledgement
 This project is mostly done using tutorial from
